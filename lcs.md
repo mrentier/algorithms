@@ -139,60 +139,69 @@ public record Sequence {
     public int Count {get;}
     public Sequence? Previous {get;}
     public (int,int) Value {get;}
-    
+
+    public static readonly Sequence Empty = new Sequence();
+
+    private Sequence() {
+        Previous = default;
+        Count = 0;
+        Value = (-1,-1);
+    }    
+
     public Sequence(
-            Sequence? previous,
+            Sequence previous,
             int m,
             int n) {
+        if (m < 0) throw new ArgumentOutOfRangeException(nameof(m));
+        if (n < 0) throw new ArgumentOutOfRangeException(nameof(n));
         Previous = previous;
-        Count = (previous?.Count??0)+1;
+        Count = previous.Count+1;
         Value = new(m,n);
     }
         
     public IEnumerable<(int,int)> Enumerate() {
-         if (Previous != default) {
-            foreach(var item in Previous.Enumerate()) {
-                yield return item;
-            }
+        if (Previous == default) yield break;
+        foreach(var item in Previous.Enumerate()) {
+            yield return item;
         }
-        yield return value;
+        yield return Value;
     }
 }
 
 public (int,int)[] LongestCommonSubsequence<T>(
-      IEnumerable<T> x, 
-      IEnumerable<T> y, 
-      IEqualityComparer<T>? comparer = default) {
-   var m = 0;
-   using var xEnum = x.GetEnumerator();
-   using var yEnum = y.GetEnumerator();
-   var v = new List<Sequence?>(new [] { default(Sequence?) });
-   comparer ??= EqualityComparer<T>.Default;
-   while (xEnum.MoveNext()) {
-      var a = default(Sequence?);
-      var n = 0;
-      yEnum.Reset();
-      while (yEnum.MoveNext()) {
-         if (v.Count <= n+1) {
-             v.Add(default);
-         }
-         if (comparer.Equals(xEnum.Current, yEnum.Current)) {
-            var tmp = a;
-            a = v[n+1];
-            v[n+1] = new Sequence(tmp, m, n);
-         }
-         else {
-            a = v[n+1];
-            if ((v[n]?.Count??0) > (v[n+1]?.Count??0)) {
-                v[n+1] = v[n];
+    IEnumerable<T> x, 
+    IEnumerable<T> y, 
+    IEqualityComparer<T>? comparer = default) {
+        var m = 0;
+        using var xEnum = x.GetEnumerator();
+        using var yEnum = y.GetEnumerator();
+        var v = new List<Sequence>(new [] { Sequence.Empty });
+        comparer ??= EqualityComparer<T>.Default;
+        while (xEnum.MoveNext()) {
+            var a = Sequence.Empty;
+            var n = 0;
+            yEnum.Reset();
+            while (yEnum.MoveNext()) {
+                if (v.Count <= n+1) {
+                     v.Add(Sequence.Empty);
+                }
+                if (comparer.Equals(xEnum.Current, yEnum.Current)) {
+                    var tmp = a;
+                    a = v[n+1];
+                    v[n+1] = new Sequence(tmp, m, n);
+                }
+                else {
+                    a = v[n+1];
+                    if (v[n].Count > v[n+1].Count) {
+                        v[n+1] = v[n];
+                    }
+                }
+                n++;
             }
-         }
-         n++;
-      }
-      m++;
-   }
-   return v[v.Count-1]?.Enumerate().ToArray() ?? Array.Empty<(int,int)>(); 
-}
+            m++;
+        }
+        return v[v.Count-1].Enumerate().ToArray(); 
+    }
 ```
 
 Space complexity for v is O(M\*N) worst case (when all elements are equal), but will typically be better since it is in the order of matches between elements from x and y. 
