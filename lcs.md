@@ -45,8 +45,8 @@ k = 0;<br/>
 do k &ne; N+1 -> h&#8729;k = 0; k = k + 1; od<br/>
 m  = 0;<br/>
 { P<sub>0</sub> &and; P<sub>1</sub> }<br/>
-do m &ne; M -> <b>h = l&#8729;(m+1);</b> m = m + 1; od<br/>
-with the bolded <b>h = l&#8729;(m+1);</b> remaining to solve for.
+do m &ne; M -> <em>h = l&#8729;(m+1);</em> m = m + 1; od<br/>
+with <em>h = l&#8729;(m+1);</em> remaining to solve for.
 
 P<sub>0</sub>(m = m + 1)<br/>
 &equiv; \< by definition of P<sub>0</sub> \><br/>
