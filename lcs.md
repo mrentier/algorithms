@@ -166,7 +166,7 @@ public (int,int)[] LongestCommonSubsequence<T>(
    var m = 0;
    using var xEnum = x.GetEnumerator();
    using var yEnum = y.GetEnumerator();
-   var v = new List<Sequence?>(new [] { new default(Sequence?) });
+   var v = new List<Sequence?>(new [] { default(Sequence?) });
    comparer ??= EqualityComparer<T>.Default;
    while (xEnum.MoveNext()) {
       var a = default(Sequence?);
